@@ -63,13 +63,18 @@
                         width: 1
                     }
                 };
-
+          
                 const pointGraphic = new Graphic({
                     geometry: point,
                     symbol: simpleMarkerSymbol
                 });
                 graphicsLayer.add(pointGraphic);
 
+                // Define a pop-up for Trailheads
+                const popupTrailheads = {
+                  "title": "Trailhead",
+                  "content": "<b>Trail:</b> {TRL_NAME}<br><b>City:</b> {CITY_JUR}<br><b>Cross Street:</b> {X_STREET}<br><b>Parking:</b> {PARKING}<br><b>Elevation:</b> {ELEV_FT} ft"
+                }
 
                 const trailheadsRenderer = {
                   "type": "simple",
@@ -104,9 +109,29 @@
                 const trailheadsLayer = new FeatureLayer({
                   url: "https://services6.arcgis.com/Zlkpq43l7FTSxOQj/arcgis/rest/services/trailheads/FeatureServer/0",
                   renderer: trailheadsRenderer,
-                  labelingInfo: [trailheadsLabels]
+                  labelingInfo: [trailheadsLabels],
+                  outFields: ["TRL_NAME","CITY_JUR","X_STREET","PARKING","ELEV_FT"],
+                  popupTemplate: popupTrailheads
                 });
                 map.add(trailheadsLayer);
+
+
+                // Define a popup for Trails
+                const popupTrails = {
+                  title: "Trail Information",
+                  content: [{
+                    type: "media",
+                    mediaInfos: [{
+                      type: "column-chart",
+                      caption: "",
+                      value: {
+                        fields: [ "ELEV_MIN","ELEV_MAX" ],
+                        normalizeField: null,
+                        tooltipField: "Min and max elevation values"
+                        }
+                      }]
+                  }]
+                }
 
                 // Define a unique value renderer and symbols
                 const trailsRenderer = {
@@ -132,7 +157,9 @@
                 const trailsLayer = new FeatureLayer({
                   url: "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Trails/FeatureServer/0",
                   renderer: trailsRenderer,
-                  opacity: .75
+                  opacity: .75,
+                  outFields: ["TRL_NAME","ELEV_GAIN"],
+                  popupTemplate: popupTrails
                 });
 
                 map.add(trailsLayer, 0);
@@ -186,13 +213,64 @@
                   ]
                 };
 
+                // Define popup for Parks and Open Spaces
+                const popupOpenspaces = {
+                  "title": "{PARK_NAME}",
+                  "content": [{
+                    "type": "fields",
+                    "fieldInfos": [
+                      {
+                        "fieldName": "AGNCY_NAME",
+                        "label": "Agency",
+                        "isEditable": true,
+                        "tooltip": "",
+                        "visible": true,
+                        "format": null,
+                        "stringFieldOption": "text-box"
+                      },
+                      {
+                        "fieldName": "TYPE",
+                        "label": "Type",
+                        "isEditable": true,
+                        "tooltip": "",
+                        "visible": true,
+                        "format": null,
+                        "stringFieldOption": "text-box"
+                      },
+                      {
+                        "fieldName": "ACCESS_TYP",
+                        "label": "Access",
+                        "isEditable": true,
+                        "tooltip": "",
+                        "visible": true,
+                        "format": null,
+                        "stringFieldOption": "text-box"
+                      },
 
+                      {
+                        "fieldName": "GIS_ACRES",
+                        "label": "Acres",
+                        "isEditable": true,
+                        "tooltip": "",
+                        "visible": true,
+                        "format": {
+                          "places": 2,
+                          "digitSeparator": true
+                        },
+
+                        "stringFieldOption": "text-box"
+                      }
+                    ]
+                  }]
+                }
                 
                 // Parks and open spaces (polygons)
                 const parksLayer = new FeatureLayer({
                   url: "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Parks_and_Open_Space/FeatureServer/0",
                   renderer: openSpacesRenderer,
-                  opacity: 0.2
+                  opacity: 0.2,
+                  outFields: ["TYPE","PARK_NAME", "AGNCY_NAME","ACCESS_TYP","GIS_ACRES","TRLS_MI","TOTAL_GOOD","TOTAL_FAIR", "TOTAL_POOR"],
+                  popupTemplate: popupOpenspaces
                 });
 
                 map.add(parksLayer, 0);
