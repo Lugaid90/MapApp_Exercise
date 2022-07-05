@@ -13,6 +13,7 @@
         margin: 0;
         height: 100%;
         width: 100%;
+        position:absolute;
       }
     </style>
 
@@ -27,10 +28,11 @@
             "esri/views/MapView",
 
             "esri/Graphic",
-            "esri/layers/GraphicsLayer"
+            "esri/layers/GraphicsLayer",
+            "esri/layers/FeatureLayer"
 
             ],
-            function (esriConfig,Map, MapView, Graphic, GraphicsLayer) {
+            function (esriConfig,Map, MapView, Graphic, GraphicsLayer, FeatureLayer) {
                 esriConfig.apiKey = "AAPK9e07baae114644c084259499cb4d40dfPLsifNx65bytHxoBSrRA-dtJO_TN5jhYyvNuj5r8PXLYEhDbcIbJLq368-rwDfZi";
 
                 const map = new Map({
@@ -40,8 +42,8 @@
                 
                 const view = new MapView({
                     map: map,
-                    //center: [-118.805, 34.027], // Longitude, latitude
-                    center: [7.464773, 51.514290], // Longitude, latitude
+                    center: [-118.805, 34.027], // Longitude, latitude
+                    //center: [7.464773, 51.514290], // Longitude, latitude
                     zoom: 14, // Zoom level
                     container: "viewDiv" // Div element
                 });
@@ -50,8 +52,8 @@
                 map.add(graphicsLayer);
                 const point = { //Create a point
                     type: "point",
-                    longitude: 7.454704,
-                    latitude: 51.520326
+                    longitude: -118.80657463861,
+                    latitude: 34.0005930608889
                 };
                 const simpleMarkerSymbol = {
                     type: "simple-marker",
@@ -67,6 +69,28 @@
                     symbol: simpleMarkerSymbol
                 });
                 graphicsLayer.add(pointGraphic);
+
+                //Trailheads feature layer (points)
+                const trailheadsLayer = new FeatureLayer({
+                  url: "https://services6.arcgis.com/Zlkpq43l7FTSxOQj/arcgis/rest/services/trailheads/FeatureServer/0"
+                });
+
+                map.add(trailheadsLayer);
+
+                //Trails feature layer (lines)
+                const trailsLayer = new FeatureLayer({
+                  url: "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Trails/FeatureServer/0"
+                });
+
+                map.add(trailsLayer, 0);
+
+                // Parks and open spaces (polygons)
+                const parksLayer = new FeatureLayer({
+                  url: "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Parks_and_Open_Space/FeatureServer/0"
+                });
+
+                map.add(parksLayer, 0);
+
 
             });
         // 
