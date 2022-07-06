@@ -29,17 +29,19 @@
 
             "esri/Graphic",
             "esri/layers/GraphicsLayer",
-            "esri/layers/FeatureLayer"
+            "esri/layers/FeatureLayer",
+            
+            "esri/rest/locator"
 
             ],
-            function (esriConfig,Map, MapView, Graphic, GraphicsLayer, FeatureLayer) {
+            function (esriConfig,Map, MapView, Graphic, GraphicsLayer, FeatureLayer, locator) {
                 esriConfig.apiKey = "AAPK9e07baae114644c084259499cb4d40dfPLsifNx65bytHxoBSrRA-dtJO_TN5jhYyvNuj5r8PXLYEhDbcIbJLq368-rwDfZi";
 
                 const map = new Map({
-                    basemap: "arcgis-topographic" // Basemap layer service
+                    // basemap: "arcgis-topographic" // Basemap layer service
+                    basemap: "arcgis-navigation" // Basemap layer service
                 });
 
-                
                 const view = new MapView({
                     map: map,
                     center: [-118.805, 34.027], // Longitude, latitude
@@ -48,6 +50,32 @@
                     container: "viewDiv" // Div element
                 });
 
+                // Geocoding
+                const serviceUrl = "http://geocode-api.arcgis.com/arcgis/rest/services/World/GeocodeServer";
+
+                view.on("click", function(evt){
+                  const params = {
+                    location: evt.mapPoint
+                  };
+
+                  locator.locationToAddress(serviceUrl, params)
+                    .then(function(response) { // Show the address found
+                      const address = response.address;
+                      showAddress(address, evt.mapPoint);
+                    }, function(err) { // Show no address found
+                      showAddress("No address found.", evt.mapPoint);
+                    });
+                });
+                	
+                function showAddress(address, pt) {
+                  view.popup.open({
+                    title:  + Math.round(pt.longitude * 100000)/100000 + ", " + Math.round(pt.latitude * 100000)/100000,
+                    content: address,
+                    location: pt
+                  });
+                }
+
+                // Graphics experiment
                 const graphicsLayer = new GraphicsLayer();
                 map.add(graphicsLayer);
                 const point = { //Create a point
