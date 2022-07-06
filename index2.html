@@ -23,6 +23,22 @@
             width: 100%;
         }
     </style>
+
+    <script>
+        require(['esri/Map', 'esri/views/MapView'], function (Map, MapView) {
+            var map = new Map({
+            basemap: 'topo',
+            });
+
+            var view = new MapView({
+            container: 'viewDiv',
+            map: map,
+            center: [-2.547855, 54.00366], // lon, lat
+            scale: 4000000,
+            });
+        });
+    </script>
+  
       
     <body>
         <div id="viewDiv"></div>
