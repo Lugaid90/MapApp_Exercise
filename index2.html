@@ -1,46 +1,110 @@
+<!DOCTYPE html>
 <html>
-    <head>
+  <head>
     <meta charset="utf-8" />
-    <meta
-        name="viewport"
-        content="initial-scale=1,maximum-scale=1,user-scalable=no"
-    />
-    <title>ArcGIS Search widget with OpenCage Data API</title>
-    <link
-        rel="stylesheet"
-        href="https://js.arcgis.com/4.15/esri/themes/light/main.css"
-    />
-    <script src="https://js.arcgis.com/4.15/"></script>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>ArcGIS API for JavaScript Tutorials: Display a map</title>
 
-    </head>
     <style>
-        html,
-        body,
-        #viewDiv {
-            padding: 0;
-            margin: 0;
-            height: 100%;
-            width: 100%;
-        }
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+        position:absolute;
+      }
     </style>
 
-    <script>
-        require(['esri/Map', 'esri/views/MapView'], function (Map, MapView) {
-            var map = new Map({
-            basemap: 'topo',
-            });
+    <link rel="stylesheet" href="https://js.arcgis.com/4.24/esri/themes/light/main.css">
+    <script src="https://js.arcgis.com/4.24/"></script>
 
-            var view = new MapView({
-            container: 'viewDiv',
-            map: map,
-            center: [-2.547855, 54.00366], // lon, lat
-            scale: 4000000,
+    
+    <script>
+        require([
+            "esri/config",
+            "esri/Map",
+            "esri/views/MapView",
+
+            "esri/widgets/Sketch",
+            "esri/layers/GraphicsLayer",
+            "esri/layers/FeatureLayer"
+            ],
+            function (esriConfig,Map, MapView, Sketch, GraphicsLayer, FeatureLayer) {
+                esriConfig.apiKey = "AAPK9e07baae114644c084259499cb4d40dfPLsifNx65bytHxoBSrRA-dtJO_TN5jhYyvNuj5r8PXLYEhDbcIbJLq368-rwDfZi";
+
+                const map = new Map({
+                    // basemap: "arcgis-topographic" // Basemap layer service
+                    basemap: "dark-gray-vector" // Basemap layer service
+                });
+
+                const view = new MapView({
+                    map: map,
+                    center: [-118.805, 34.027], // Longitude, latitude
+                    //center: [7.464773, 51.514290], // Longitude, latitude
+                    zoom: 3, // Zoom level
+                    container: "viewDiv" // Div element
+                });
+                
+
+                const citiesRenderer = {
+                    type: "simple",
+                    symbol: {
+                        type: "simple-marker",
+                        size: 5,
+                        color: [18, 230, 25],
+                        outline: null
+                    },
+
+                    visualVariables: [
+                    {
+                        type: "size",
+                        field: "POP",
+                        minDataValue: 0,
+                        maxDataValue: 5e6,//reasonable range for european cities
+                        minSize: "3px",
+                        maxSize: "30px"
+                    }
+                    ]
+                };
+
+
+                const citiesLabels = {
+                    symbol: {
+                        type: "text",
+                        color: "#FFFFFF",
+                        haloColor: "#5E8D74",
+                        haloSize: "2px",
+                        font: {
+                            size: "12px",
+                            family: "Noto Sans",
+                            style: "italic",
+                            weight: "normal"
+                        }
+                    },
+                    labelPlacement: "above-center",
+                    labelExpressionInfo: {
+                        expression: "$feature.CITY_NAME"
+                    }
+                };
+
+                // Reference query layer
+                const citiesLayer = new FeatureLayer({
+                    url: "https://services.arcgis.com/P3ePLMYs2RVChkJx/ArcGIS/rest/services/World_Cities/FeatureServer/0",
+                    // url: "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/LA_County_Parcels/FeatureServer/0",
+                    renderer: citiesRenderer,
+                    labelingInfo: [citiesLabels]
+                });
+                
+                map.add(citiesLayer, 0);
+
             });
-        });
-    </script>
-  
-      
-    <body>
-        <div id="viewDiv"></div>
-    </body>
+        // 
+    </script> 
+
+  </head>
+  <body>
+    <div id="viewDiv"></div>
+  </body>
 </html>
