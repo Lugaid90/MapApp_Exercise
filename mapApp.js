@@ -10,7 +10,6 @@ require([
     "esri/Map",
     "esri/views/MapView",
 
-    "esri/widgets/Sketch",
     "esri/layers/GraphicsLayer",
     "esri/layers/FeatureLayer",
     "esri/rest/locator",
@@ -18,7 +17,7 @@ require([
     "/widget/AuthorWidget.js",
     "dojo/domReady!"
     ],
-    function (esriConfig,Map, MapView, Sketch, GraphicsLayer, FeatureLayer,locator, dom,  AuthorWidget) {
+    function (esriConfig,Map, MapView,  GraphicsLayer, FeatureLayer,locator, dom,  AuthorWidget) {
         esriConfig.apiKey = "AAPK9e07baae114644c084259499cb4d40dfPLsifNx65bytHxoBSrRA-dtJO_TN5jhYyvNuj5r8PXLYEhDbcIbJLq368-rwDfZi";
 
 
@@ -35,9 +34,9 @@ require([
 
         const view = new MapView({
             map: map,
-            center: [-118.805, 34.027], // Longitude, latitude
+            center: [7.466413, 51.513822 ], // Longitude, latitude
             //center: [7.464773, 51.514290], // Longitude, latitude
-            zoom: 3, // Zoom level
+            zoom: 4, // Zoom level
             container: "viewDiv" // Div element
         });
         
@@ -47,10 +46,11 @@ require([
                 location: evt.mapPoint
             };
             
-            pickedX = params.location.y;
-            pickedY = params.location.x;
-
-            coordWidget.updateCoordinates(pickedX, pickedY);
+            longitude = evt.mapPoint.longitude;
+            latitude = evt.mapPoint.latitude;
+            // var mp = webMercatorUtils.webMercatorToGeographic(evt.mapPoint);
+            // console.log(mp)
+            coordWidget.updateCoordinates(latitude, longitude);
             
         });
 

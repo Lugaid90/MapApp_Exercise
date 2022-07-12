@@ -26,8 +26,8 @@ define([
         },
 
         updateCoordinates: function(latitude, Longitude){
-            this.latNode.innerHTML=latitude.toFixed(2);
-            this.longNode.innerHTML=Longitude.toFixed(2);
+            this.latNode.innerHTML=latitude.toFixed(6);
+            this.longNode.innerHTML=Longitude.toFixed(6);
         }
     });
     
