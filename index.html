@@ -22,141 +22,15 @@
     <script src="https://js.arcgis.com/4.24/"></script>
 
     
-    <script>
-var pickedX = undefined;
-var pickedY = undefined;
-        require([
-            "esri/config",
-            "esri/Map",
-            "esri/views/MapView",
-
-            "esri/widgets/Sketch",
-            "esri/layers/GraphicsLayer",
-            "esri/layers/FeatureLayer",
-            "esri/rest/locator"
-            ],
-            function (esriConfig,Map, MapView, Sketch, GraphicsLayer, FeatureLayer,locator) {
-                esriConfig.apiKey = "AAPK9e07baae114644c084259499cb4d40dfPLsifNx65bytHxoBSrRA-dtJO_TN5jhYyvNuj5r8PXLYEhDbcIbJLq368-rwDfZi";
-
-                const map = new Map({
-                    // basemap: "arcgis-topographic" // Basemap layer service
-                    basemap: "dark-gray-vector" // Basemap layer service
-                });
-
-                const view = new MapView({
-                    map: map,
-                    center: [-118.805, 34.027], // Longitude, latitude
-                    //center: [7.464773, 51.514290], // Longitude, latitude
-                    zoom: 3, // Zoom level
-                    container: "viewDiv" // Div element
-                });
-                
-                
-                view.on("click", function(evt){
-                    const params = {
-                        location: evt.mapPoint
-                    };
-                    console.log(params);
-                    pickedX = params.location.y;
-                    pickedY = params.location.x;
-                    
-                    //document.getElementById("widg1").innerHTML="X:"+pickedX;
-                    //document.getElementById("widg2").innerHTML="Y:"+pickedY;
-                    document.getElementById("text1").value=pickedX;
-                    document.getElementById("text2").value=pickedY;
-                    document.getElementById("dijit__TemplatedMixin_0").style.display = "block";
-                });
-
-                const citiesRenderer = {
-                    type: "simple",
-                    symbol: {
-                        type: "simple-marker",
-                        size: 5,
-                        color: [18, 230, 25],
-                        outline: null
-                    },
-
-                    visualVariables: [
-                    {
-                        type: "size",
-                        field: "POP",
-                        minDataValue: 0,
-                        maxDataValue: 5e6,//reasonable range for european cities
-                        minSize: "3px",
-                        maxSize: "30px"
-                    }
-                    ]
-                };
-
-
-                const citiesLabels = {
-                    symbol: {
-                        type: "text",
-                        color: "#FFFFFF",
-                        haloColor: "#5E8D74",
-                        haloSize: "2px",
-                        font: {
-                            size: "12px",
-                            family: "Noto Sans",
-                            style: "italic",
-                            weight: "normal"
-                        }
-                    },
-                    labelPlacement: "above-center",
-                    labelExpressionInfo: {
-                        expression: "$feature.CITY_NAME"
-                    }
-                };
-
-                // Reference query layer
-                const citiesLayer = new FeatureLayer({
-                    url: "https://services.arcgis.com/P3ePLMYs2RVChkJx/ArcGIS/rest/services/World_Cities/FeatureServer/0",
-                    // url: "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/LA_County_Parcels/FeatureServer/0",
-                    renderer: citiesRenderer,
-                    labelingInfo: [citiesLabels]
-                });
-                
-                map.add(citiesLayer, 0);
-
-            });
-        // 
-    </script> 
+    <script src="mapApp.js"></script>
 
   </head>
   <body>
     <div id="viewDiv" >
-        <div id="authorContainer"style="position: absolute; right: 2.5%; top:5%; width:200px"></div>
+        <div id="coordWidget" ></div>
     </div>
 
     
-
-    
-    <script>
-        require(["dojo/request", 
-        "dojo/dom", 
-        "dojo/_base/array", 
-        "/widget/AuthorWidget.js",
-        // "MapApp_Exercise/widget/AuthorWidget", 
-        "dojo/domReady!"],
-        function(request, dom, arrayUtil, AuthorWidget){
-            // Load up our authors
-            request("data/authors.json", {
-                handleAs: "json"
-            }).then(function(authors){
-                // Get a reference to our container
-                var authorContainer = dom.byId("authorContainer");
-
-                arrayUtil.forEach(authors, function(author){
-                    // Create our widget and place it
-                    var widget = new AuthorWidget(author).placeAt(authorContainer);
-                });
-            });
-        });
-
-        function printInfo(txt){
-            alert(pickedX +" | "+pickedY+ txt);
-        }
-    </script>
     
   </body>
 </html>
