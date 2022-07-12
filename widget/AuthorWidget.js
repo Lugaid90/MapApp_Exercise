@@ -18,6 +18,7 @@ define([
         avatar: require.toUrl("./images/KirinTor.jpg"),
         bio: "",
 
+
         // Our template - important!
         templateString: template,
 

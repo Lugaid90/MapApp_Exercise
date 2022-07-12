@@ -2,6 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <link rel="stylesheet" href="/widget/css/style.css">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
     <title>ArcGIS API for JavaScript Tutorials: Display a map</title>
 
@@ -22,6 +23,8 @@
 
     
     <script>
+var pickedX = undefined;
+var pickedY = undefined;
         require([
             "esri/config",
             "esri/Map",
@@ -29,9 +32,10 @@
 
             "esri/widgets/Sketch",
             "esri/layers/GraphicsLayer",
-            "esri/layers/FeatureLayer"
+            "esri/layers/FeatureLayer",
+            "esri/rest/locator"
             ],
-            function (esriConfig,Map, MapView, Sketch, GraphicsLayer, FeatureLayer) {
+            function (esriConfig,Map, MapView, Sketch, GraphicsLayer, FeatureLayer,locator) {
                 esriConfig.apiKey = "AAPK9e07baae114644c084259499cb4d40dfPLsifNx65bytHxoBSrRA-dtJO_TN5jhYyvNuj5r8PXLYEhDbcIbJLq368-rwDfZi";
 
                 const map = new Map({
@@ -47,6 +51,21 @@
                     container: "viewDiv" // Div element
                 });
                 
+                
+                view.on("click", function(evt){
+                    const params = {
+                        location: evt.mapPoint
+                    };
+                    console.log(params);
+                    pickedX = params.location.y;
+                    pickedY = params.location.x;
+                    
+                    //document.getElementById("widg1").innerHTML="X:"+pickedX;
+                    //document.getElementById("widg2").innerHTML="Y:"+pickedY;
+                    document.getElementById("text1").value=pickedX;
+                    document.getElementById("text2").value=pickedY;
+                    document.getElementById("dijit__TemplatedMixin_0").style.display = "block";
+                });
 
                 const citiesRenderer = {
                     type: "simple",
@@ -105,6 +124,39 @@
 
   </head>
   <body>
-    <div id="viewDiv"></div>
+    <div id="viewDiv" >
+        <div id="authorContainer"style="position: absolute; right: 2.5%; top:5%; width:200px"></div>
+    </div>
+
+    
+
+    
+    <script>
+        require(["dojo/request", 
+        "dojo/dom", 
+        "dojo/_base/array", 
+        "/widget/AuthorWidget.js",
+        // "MapApp_Exercise/widget/AuthorWidget", 
+        "dojo/domReady!"],
+        function(request, dom, arrayUtil, AuthorWidget){
+            // Load up our authors
+            request("data/authors.json", {
+                handleAs: "json"
+            }).then(function(authors){
+                // Get a reference to our container
+                var authorContainer = dom.byId("authorContainer");
+
+                arrayUtil.forEach(authors, function(author){
+                    // Create our widget and place it
+                    var widget = new AuthorWidget(author).placeAt(authorContainer);
+                });
+            });
+        });
+
+        function printInfo(txt){
+            alert(pickedX +" | "+pickedY+ txt);
+        }
+    </script>
+    
   </body>
 </html>
