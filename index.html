@@ -2,6 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <link rel="stylesheet" href="/widget/css/style.css">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
     <title>ArcGIS API for JavaScript Tutorials: Display a map</title>
 
@@ -22,288 +23,100 @@
 
     
     <script>
+var pickedX = undefined;
+var pickedY = undefined;
         require([
             "esri/config",
             "esri/Map",
             "esri/views/MapView",
 
-            "esri/Graphic",
+            "esri/widgets/Sketch",
             "esri/layers/GraphicsLayer",
             "esri/layers/FeatureLayer",
-            
             "esri/rest/locator"
-
             ],
-            function (esriConfig,Map, MapView, Graphic, GraphicsLayer, FeatureLayer, locator) {
+            function (esriConfig,Map, MapView, Sketch, GraphicsLayer, FeatureLayer,locator) {
                 esriConfig.apiKey = "AAPK9e07baae114644c084259499cb4d40dfPLsifNx65bytHxoBSrRA-dtJO_TN5jhYyvNuj5r8PXLYEhDbcIbJLq368-rwDfZi";
 
                 const map = new Map({
                     // basemap: "arcgis-topographic" // Basemap layer service
-                    basemap: "arcgis-navigation" // Basemap layer service
+                    basemap: "dark-gray-vector" // Basemap layer service
                 });
 
                 const view = new MapView({
                     map: map,
                     center: [-118.805, 34.027], // Longitude, latitude
                     //center: [7.464773, 51.514290], // Longitude, latitude
-                    zoom: 14, // Zoom level
+                    zoom: 3, // Zoom level
                     container: "viewDiv" // Div element
                 });
-
-                // Geocoding
-                const serviceUrl = "http://geocode-api.arcgis.com/arcgis/rest/services/World/GeocodeServer";
-
+                
+                
                 view.on("click", function(evt){
-                  const params = {
-                    location: evt.mapPoint
-                  };
-
-                  locator.locationToAddress(serviceUrl, params)
-                    .then(function(response) { // Show the address found
-                      const address = response.address;
-                      showAddress(address, evt.mapPoint);
-                    }, function(err) { // Show no address found
-                      showAddress("No address found.", evt.mapPoint);
-                    });
-                });
-                	
-                function showAddress(address, pt) {
-                  view.popup.open({
-                    title:  + Math.round(pt.longitude * 100000)/100000 + ", " + Math.round(pt.latitude * 100000)/100000,
-                    content: address,
-                    location: pt
-                  });
-                }
-
-                // Graphics experiment
-                const graphicsLayer = new GraphicsLayer();
-                map.add(graphicsLayer);
-                const point = { //Create a point
-                    type: "point",
-                    longitude: -118.80657463861,
-                    latitude: 34.0005930608889
-                };
-                const simpleMarkerSymbol = {
-                    type: "simple-marker",
-                    color: [226, 60, 40],  // Orange
-                    outline: {
-                        color: [255, 255, 255], // White
-                        width: 1
-                    }
-                };
-          
-                const pointGraphic = new Graphic({
-                    geometry: point,
-                    symbol: simpleMarkerSymbol
-                });
-                graphicsLayer.add(pointGraphic);
-
-                // Define a pop-up for Trailheads
-                const popupTrailheads = {
-                  "title": "Trailhead",
-                  "content": "<b>Trail:</b> {TRL_NAME}<br><b>City:</b> {CITY_JUR}<br><b>Cross Street:</b> {X_STREET}<br><b>Parking:</b> {PARKING}<br><b>Elevation:</b> {ELEV_FT} ft"
-                }
-
-                const trailheadsRenderer = {
-                  "type": "simple",
-                  "symbol": {
-                    "type": "picture-marker",
-                    "url": "http://static.arcgis.com/images/Symbols/NPS/npsPictograph_0231b.png",
-                    "width": "18px",
-                    "height": "18px"
-                  }
-                }
-                const trailheadsLabels = {
-                  symbol: {
-                    type: "text",
-                    color: "#FFFFFF",
-                    haloColor: "#5E8D74",
-                    haloSize: "2px",
-                    font: {
-                      size: "12px",
-                      family: "Noto Sans",
-                      style: "italic",
-                      weight: "normal"
-                    }
-                  },
-
-                  labelPlacement: "above-center",
-                  labelExpressionInfo: {
-                    expression: "$feature.TRL_NAME"
-                  }
-                };
-
-                //Trailheads feature layer (points)
-                const trailheadsLayer = new FeatureLayer({
-                  url: "https://services6.arcgis.com/Zlkpq43l7FTSxOQj/arcgis/rest/services/trailheads/FeatureServer/0",
-                  renderer: trailheadsRenderer,
-                  labelingInfo: [trailheadsLabels],
-                  outFields: ["TRL_NAME","CITY_JUR","X_STREET","PARKING","ELEV_FT"],
-                  popupTemplate: popupTrailheads
-                });
-                map.add(trailheadsLayer);
-
-
-                // Define a popup for Trails
-                const popupTrails = {
-                  title: "Trail Information",
-                  content: [{
-                    type: "media",
-                    mediaInfos: [{
-                      type: "column-chart",
-                      caption: "",
-                      value: {
-                        fields: [ "ELEV_MIN","ELEV_MAX" ],
-                        normalizeField: null,
-                        tooltipField: "Min and max elevation values"
-                        }
-                      }]
-                  }]
-                }
-
-                // Define a unique value renderer and symbols
-                const trailsRenderer = {
-                  type: "simple",
-                  symbol: {
-                    color: "#BA55D3",
-                    type: "simple-line",
-                    style: "solid"
-                  },
-
-                  visualVariables: [
-                    {
-                      type: "size",
-                      field: "ELEV_GAIN",
-                      minDataValue: 0,
-                      maxDataValue: 2300,
-                      minSize: "3px",
-                      maxSize: "7px"
-                    }
-                  ]
-                };
-                //Trails feature layer (lines)
-                const trailsLayer = new FeatureLayer({
-                  url: "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Trails/FeatureServer/0",
-                  renderer: trailsRenderer,
-                  opacity: .75,
-                  outFields: ["TRL_NAME","ELEV_GAIN"],
-                  popupTemplate: popupTrails
+                    const params = {
+                        location: evt.mapPoint
+                    };
+                    console.log(params);
+                    pickedX = params.location.y;
+                    pickedY = params.location.x;
+                    
+                    //document.getElementById("widg1").innerHTML="X:"+pickedX;
+                    //document.getElementById("widg2").innerHTML="Y:"+pickedY;
+                    document.getElementById("text1").value=pickedX;
+                    document.getElementById("text2").value=pickedY;
+                    document.getElementById("dijit__TemplatedMixin_0").style.display = "block";
                 });
 
-                map.add(trailsLayer, 0);
-
-
-                // Add bikes only trails
-                const bikeTrailsRenderer = {
-                  type: "simple",
-                  symbol: {
-                    type: "simple-line",
-                    style: "short-dot",
-                    color: "#FF91FF",
-                    width: "1px"
-                  }
-                };
-
-                const bikeTrails = new FeatureLayer({
-                  url:
-                    "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Trails/FeatureServer/0",
-                  renderer: bikeTrailsRenderer,
-                  definitionExpression: "USE_BIKE = 'YES'"
-                });
-
-                map.add(bikeTrails, 1);
-
-
-                // Add parks with a class breaks renderer and unique symbols
-                function createFillSymbol(value, color) {
-                  return {
-                    "value": value,
-                    "symbol": {
-                      "color": color,
-                      "type": "simple-fill",
-                      "style": "solid",
-                      "outline": {
-                        "style": "none"
-                      }
+                const citiesRenderer = {
+                    type: "simple",
+                    symbol: {
+                        type: "simple-marker",
+                        size: 5,
+                        color: [18, 230, 25],
+                        outline: null
                     },
-                    "label": value
-                  };
-                }
 
-                const openSpacesRenderer = {
-                  type: "unique-value",
-                  field: "TYPE",
-                  uniqueValueInfos: [
-                    createFillSymbol("Natural Areas", "#9E559C"),
-                    createFillSymbol("Regional Open Space", "#A7C636"),
-                    createFillSymbol("Local Park", "#149ECE"),
-                    createFillSymbol("Regional Recreation Park", "#ED5151")
-                  ]
+                    visualVariables: [
+                    {
+                        type: "size",
+                        field: "POP",
+                        minDataValue: 0,
+                        maxDataValue: 5e6,//reasonable range for european cities
+                        minSize: "3px",
+                        maxSize: "30px"
+                    }
+                    ]
                 };
 
-                // Define popup for Parks and Open Spaces
-                const popupOpenspaces = {
-                  "title": "{PARK_NAME}",
-                  "content": [{
-                    "type": "fields",
-                    "fieldInfos": [
-                      {
-                        "fieldName": "AGNCY_NAME",
-                        "label": "Agency",
-                        "isEditable": true,
-                        "tooltip": "",
-                        "visible": true,
-                        "format": null,
-                        "stringFieldOption": "text-box"
-                      },
-                      {
-                        "fieldName": "TYPE",
-                        "label": "Type",
-                        "isEditable": true,
-                        "tooltip": "",
-                        "visible": true,
-                        "format": null,
-                        "stringFieldOption": "text-box"
-                      },
-                      {
-                        "fieldName": "ACCESS_TYP",
-                        "label": "Access",
-                        "isEditable": true,
-                        "tooltip": "",
-                        "visible": true,
-                        "format": null,
-                        "stringFieldOption": "text-box"
-                      },
 
-                      {
-                        "fieldName": "GIS_ACRES",
-                        "label": "Acres",
-                        "isEditable": true,
-                        "tooltip": "",
-                        "visible": true,
-                        "format": {
-                          "places": 2,
-                          "digitSeparator": true
-                        },
+                const citiesLabels = {
+                    symbol: {
+                        type: "text",
+                        color: "#FFFFFF",
+                        haloColor: "#5E8D74",
+                        haloSize: "2px",
+                        font: {
+                            size: "12px",
+                            family: "Noto Sans",
+                            style: "italic",
+                            weight: "normal"
+                        }
+                    },
+                    labelPlacement: "above-center",
+                    labelExpressionInfo: {
+                        expression: "$feature.CITY_NAME"
+                    }
+                };
 
-                        "stringFieldOption": "text-box"
-                      }
-                    ]
-                  }]
-                }
-                
-                // Parks and open spaces (polygons)
-                const parksLayer = new FeatureLayer({
-                  url: "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Parks_and_Open_Space/FeatureServer/0",
-                  renderer: openSpacesRenderer,
-                  opacity: 0.2,
-                  outFields: ["TYPE","PARK_NAME", "AGNCY_NAME","ACCESS_TYP","GIS_ACRES","TRLS_MI","TOTAL_GOOD","TOTAL_FAIR", "TOTAL_POOR"],
-                  popupTemplate: popupOpenspaces
+                // Reference query layer
+                const citiesLayer = new FeatureLayer({
+                    url: "https://services.arcgis.com/P3ePLMYs2RVChkJx/ArcGIS/rest/services/World_Cities/FeatureServer/0",
+                    // url: "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/LA_County_Parcels/FeatureServer/0",
+                    renderer: citiesRenderer,
+                    labelingInfo: [citiesLabels]
                 });
-
-                map.add(parksLayer, 0);
-              
                 
+                map.add(citiesLayer, 0);
 
             });
         // 
@@ -311,6 +124,39 @@
 
   </head>
   <body>
-    <div id="viewDiv"></div>
+    <div id="viewDiv" >
+        <div id="authorContainer"style="position: absolute; right: 2.5%; top:5%; width:200px"></div>
+    </div>
+
+    
+
+    
+    <script>
+        require(["dojo/request", 
+        "dojo/dom", 
+        "dojo/_base/array", 
+        "/widget/AuthorWidget.js",
+        // "MapApp_Exercise/widget/AuthorWidget", 
+        "dojo/domReady!"],
+        function(request, dom, arrayUtil, AuthorWidget){
+            // Load up our authors
+            request("data/authors.json", {
+                handleAs: "json"
+            }).then(function(authors){
+                // Get a reference to our container
+                var authorContainer = dom.byId("authorContainer");
+
+                arrayUtil.forEach(authors, function(author){
+                    // Create our widget and place it
+                    var widget = new AuthorWidget(author).placeAt(authorContainer);
+                });
+            });
+        });
+
+        function printInfo(txt){
+            alert(pickedX +" | "+pickedY+ txt);
+        }
+    </script>
+    
   </body>
 </html>
