@@ -2,7 +2,7 @@ define([
     "dojo/_base/declare",
     "dijit/_WidgetBase",
     "dijit/_TemplatedMixin",
-    "dojo/text!./templates/coordWidget.html"
+    "dojo/text!./templates/weatherWidget.html"
 ], function(declare,  _WidgetBase, _TemplatedMixin, template){
     return declare([_WidgetBase, _TemplatedMixin], {
 
@@ -10,7 +10,7 @@ define([
         templateString: template,
 
         // A class to be applied to the root node in our template
-        baseClass: "coordWidget",
+        baseClass: "weatherWidget",
 
 
         //overloading postCreate function from WidgetBase which is fired
@@ -18,13 +18,13 @@ define([
         postCreate: function(){
             // Run any parent postCreate processes 
             this.inherited(arguments);
+        
         },
 
         // costum setter function which is ment to be used
         //  in a callback for a click listener
-        updateCoordinates: function(latitude, Longitude){
-            this.latNode.innerHTML=latitude.toFixed(6);
-            this.longNode.innerHTML=Longitude.toFixed(6);
+        updateAdress: function(adress){
+            this.adressNode.innerHTML=adress;
         }
     });
     

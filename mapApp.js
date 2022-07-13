@@ -9,21 +9,24 @@ require([
     "esri/config",
     "esri/Map",
     "esri/views/MapView",
+    'esri/request',
 
-    "esri/layers/GraphicsLayer",
     "esri/layers/FeatureLayer",
-    "esri/rest/locator",
     "dojo/dom", 
     "/widget/coordWidget.js",
+    "/widget/weatherWidget.js",
     "dojo/domReady!"
     ],
-    function (esriConfig,Map, MapView,  GraphicsLayer, FeatureLayer,locator, dom,  AuthorWidget) {
+    function (esriConfig, Map, MapView, esriRequest, FeatureLayer, dom,  CoordWidget,  WeatherWidget) {
         esriConfig.apiKey = "AAPK9e07baae114644c084259499cb4d40dfPLsifNx65bytHxoBSrRA-dtJO_TN5jhYyvNuj5r8PXLYEhDbcIbJLq368-rwDfZi";
 
 
-        // Setting up Dijit Widget
+        // Setting up Dijit Widgets
         var coordWidgetContainer = dom.byId("coordWidget");
-        var coordWidget = new AuthorWidget("").placeAt(coordWidgetContainer);
+        var coordWidget = new CoordWidget("").placeAt(coordWidgetContainer);
+        
+        var weatherWidgetContainer = dom.byId("weatherWidget");
+        var weatherWidget = new WeatherWidget("").placeAt(weatherWidgetContainer);
         
 
         const map = new Map({
@@ -41,13 +44,60 @@ require([
         // Setting up listener to update the coordinate widget with 
         //  selected coordinates
         view.on("click", function(evt){
+            //Get Point Coordinates
             const params = {
                 location: evt.mapPoint
             };
-            
             longitude = evt.mapPoint.longitude;
             latitude = evt.mapPoint.latitude;
+
+            // update the coordinate Widget
             coordWidget.updateCoordinates(latitude, longitude);
+
+
+            //Update Weather Widget (and reverse geocode)
+
+            // Consume the OpenCageData API for Reverse Geocoding
+            // var API_KEY = '1f5aa7d5392b4351aeaa6d83eadf550e'; // Conterra, doesn't work :(
+            var API_KEY = '2c84cd9d031745ccadca366dcc0bd7a6';
+            var api_url = 'https://api.opencagedata.com/geocode/v1/json'
+            var request_url = api_url
+                + '?'
+                + 'key=' + API_KEY
+                + '&q=' + encodeURIComponent(latitude + ',' + longitude)
+                + '&pretty=1'
+                + '&no_annotations=1';
+
+            fetch(request_url)
+            .then( (response) => response.json())
+            .then((data)=> {
+                console.log(data.results[0].formatted);
+                weatherWidget.updateAdress(data.results[0].formatted);
+            } )// output will be the required data
+            .catch( (error) => console.log(error))
+
+
+            
+            // Consume the OpenWeatherMap API for Weather Forecast
+            var API_KEY_wthr = '6b904086651c872d0e2c58c1529d2dcb';
+            var api_url_wthr = 'http://api.openweathermap.org/data/2.5/forecast'
+            var request_url_wthr = api_url_wthr
+                + '?'
+                + 'lat=' +  latitude
+                + '&lon=' +  longitude
+                + '&appid=' + API_KEY_wthr;
+
+            
+            fetch(request_url_wthr)
+            .then( (response) => response.json())
+            .then((data)=> {
+                console.log(data);
+                // weatherWidget.updateAdress(data.results[0].formatted);
+            } )// output will be the required data
+            .catch( (error) => console.log(error))
+            // console.log("long , lat:  " + longitude + " "  + latitude );
+            // console.log("encodeURIComponent(latitude ):  " + encodeURIComponent(latitude ) );
+
         });
 
 
@@ -105,5 +155,7 @@ require([
         
         // connecting city data to the map
         map.add(citiesLayer, 0);
+
+        
 
     });
