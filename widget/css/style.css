@@ -14,10 +14,10 @@
 .weatherWidget {
   position: absolute; 
   right: 2.5%; 
-  top:45%;
+  top:35%;
   width:200px;
   text-align: center;
-  background-color: rgb(27, 46, 77);
+  background-color: rgb(24, 48, 33);
   color: white;
   border-radius: 15px;
   padding: 10px;
