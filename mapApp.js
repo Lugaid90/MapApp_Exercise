@@ -14,7 +14,7 @@ require([
     "esri/layers/FeatureLayer",
     "esri/rest/locator",
     "dojo/dom", 
-    "/widget/AuthorWidget.js",
+    "/widget/coordWidget.js",
     "dojo/domReady!"
     ],
     function (esriConfig,Map, MapView,  GraphicsLayer, FeatureLayer,locator, dom,  AuthorWidget) {
@@ -22,25 +22,24 @@ require([
 
 
         // Setting up Dijit Widget
-        var authorContainer = dom.byId("coordWidget");
-        var coordWidget = new AuthorWidget("").placeAt(authorContainer);
+        var coordWidgetContainer = dom.byId("coordWidget");
+        var coordWidget = new AuthorWidget("").placeAt(coordWidgetContainer);
         
 
-
         const map = new Map({
-            // basemap: "arcgis-topographic" // Basemap layer service
-            basemap: "dark-gray-vector" // Basemap layer service
+            basemap: "dark-gray-vector"
         });
 
         const view = new MapView({
             map: map,
             center: [7.466413, 51.513822 ], // Longitude, latitude
-            //center: [7.464773, 51.514290], // Longitude, latitude
             zoom: 4, // Zoom level
-            container: "viewDiv" // Div element
+            container: "viewDiv" // Div element/ Anchor tag in the main html
         });
         
         
+        // Setting up listener to update the coordinate widget with 
+        //  selected coordinates
         view.on("click", function(evt){
             const params = {
                 location: evt.mapPoint
@@ -48,12 +47,14 @@ require([
             
             longitude = evt.mapPoint.longitude;
             latitude = evt.mapPoint.latitude;
-            // var mp = webMercatorUtils.webMercatorToGeographic(evt.mapPoint);
-            // console.log(mp)
             coordWidget.updateCoordinates(latitude, longitude);
-            
         });
 
+
+        // Importing a service layer containing informations about cities
+        //
+
+        // visual styling of city markers
         const citiesRenderer = {
             type: "simple",
             symbol: {
@@ -74,8 +75,8 @@ require([
             }
             ]
         };
-
-
+        
+        // visual styling of city labels
         const citiesLabels = {
             symbol: {
                 type: "text",
@@ -95,13 +96,14 @@ require([
             }
         };
 
-        // Reference query layer
+        // creating the feature layer and importing the city data
         const citiesLayer = new FeatureLayer({
             url: "https://services.arcgis.com/P3ePLMYs2RVChkJx/ArcGIS/rest/services/World_Cities/FeatureServer/0",
             renderer: citiesRenderer,
             labelingInfo: [citiesLabels]
         });
         
+        // connecting city data to the map
         map.add(citiesLayer, 0);
 
     });
