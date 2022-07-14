@@ -71,13 +71,16 @@ require([
             fetch(request_url)
             .then( (response) => response.json())
             .then((data)=> {
-                console.log(data.results[0].formatted);
-                weatherWidget.updateAdress(data.results[0].formatted);
+                if (typeof data.results[0] !== 'undefined'){
+                    weatherWidget.updateAdress(data.results[0].formatted);
+                }
+                else{
+                    weatherWidget.updateAdress("No Adress found");
+                }
             } )
             .catch( (error) => console.log(error));
 
 
-            
             // Consume the OpenWeatherMap API for Weather Forecast
             var API_KEY_wthr = '6b904086651c872d0e2c58c1529d2dcb';
             var api_url_wthr = 'http://api.openweathermap.org/data/2.5/forecast'
@@ -86,25 +89,18 @@ require([
                 + 'lat=' +  latitude
                 + '&lon=' +  longitude
                 + '&appid=' + API_KEY_wthr;
-
             
             fetch(request_url_wthr)
             .then( (response) => response.json())
             .then((data)=> {
-                console.log(data);
-                console.log("data - exploration");
-                // console.log(data.cnt);
-                // console.log("data - exploration2");
                 forecst5d = data.list[data.cnt-1];
-                console.log(forecst5d);
-                // weatherWidget.updateAdress(data.results[0].formatted);
                 weatherWidget.updateForecast(
                     forecst5d.dt_txt,
                     (forecst5d.main.temp - 273.15).toFixed(1) + "° C", // from Kelvin to Celsius
                     forecst5d.main.humidity  + " %",
                     forecst5d.clouds.all  + " %",
                     (forecst5d.wind.speed*3.6).toFixed(1)   + " km/h");  // m/s to km/h
-            } )
+                } )
             .catch( (error) => console.log(error));
             
         });
