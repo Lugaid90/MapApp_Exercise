@@ -25,6 +25,16 @@ define([
         //  in a callback for a click listener
         updateAdress: function(adress){
             this.adressNode.innerHTML=adress;
+        },
+
+        updateForecast: function(date, temp, hum, cloud, wind){
+            this.dateNode.innerHTML=date;
+            this.tempNode.innerHTML=temp;
+            // console.log("test");
+            // console.log(this.tempNode);
+            this.humNode.innerHTML=hum;
+            this.cloudNode.innerHTML=cloud;
+            this.windNode.innerHTML=wind;
         }
     });
     

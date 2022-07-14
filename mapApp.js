@@ -73,8 +73,8 @@ require([
             .then((data)=> {
                 console.log(data.results[0].formatted);
                 weatherWidget.updateAdress(data.results[0].formatted);
-            } )// output will be the required data
-            .catch( (error) => console.log(error))
+            } )
+            .catch( (error) => console.log(error));
 
 
             
@@ -92,12 +92,21 @@ require([
             .then( (response) => response.json())
             .then((data)=> {
                 console.log(data);
+                console.log("data - exploration");
+                // console.log(data.cnt);
+                // console.log("data - exploration2");
+                forecst5d = data.list[data.cnt-1];
+                console.log(forecst5d);
                 // weatherWidget.updateAdress(data.results[0].formatted);
-            } )// output will be the required data
-            .catch( (error) => console.log(error))
-            // console.log("long , lat:  " + longitude + " "  + latitude );
-            // console.log("encodeURIComponent(latitude ):  " + encodeURIComponent(latitude ) );
-
+                weatherWidget.updateForecast(
+                    forecst5d.dt_txt,
+                    (forecst5d.main.temp - 273.15).toFixed(1) + "° C", // from Kelvin to Celsius
+                    forecst5d.main.humidity  + " %",
+                    forecst5d.clouds.all  + " %",
+                    (forecst5d.wind.speed*3.6).toFixed(1)   + " km/h");  // m/s to km/h
+            } )
+            .catch( (error) => console.log(error));
+            
         });
 
 
