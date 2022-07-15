@@ -27,11 +27,17 @@ define([
             this.adressNode.innerHTML=adress;
         },
 
-        updateForecast: function(date, temp, hum, cloud, wind){
+        updateForecast: function(dataObj){
+
+            forecst5d = dataObj.list[dataObj.cnt-1];
+            date = forecst5d.dt_txt,
+            temp = (forecst5d.main.temp - 273.15).toFixed(1) + "° C", // from Kelvin to Celsius
+            hum = forecst5d.main.humidity  + " %",
+            cloud = forecst5d.clouds.all  + " %",
+            wind = (forecst5d.wind.speed*3.6).toFixed(1)   + " km/h"; // m/s to km/h
+
             this.dateNode.innerHTML=date;
             this.tempNode.innerHTML=temp;
-            // console.log("test");
-            // console.log(this.tempNode);
             this.humNode.innerHTML=hum;
             this.cloudNode.innerHTML=cloud;
             this.windNode.innerHTML=wind;

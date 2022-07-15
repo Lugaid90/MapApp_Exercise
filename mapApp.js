@@ -9,7 +9,6 @@ require([
     "esri/config",
     "esri/Map",
     "esri/views/MapView",
-    'esri/request',
 
     "esri/layers/FeatureLayer",
     "dojo/dom", 
@@ -17,7 +16,7 @@ require([
     "/widget/weatherWidget.js",
     "dojo/domReady!"
     ],
-    function (esriConfig, Map, MapView, esriRequest, FeatureLayer, dom,  CoordWidget,  WeatherWidget) {
+    function (esriConfig, Map, MapView,  FeatureLayer, dom,  CoordWidget,  WeatherWidget) {
         esriConfig.apiKey = "AAPK9e07baae114644c084259499cb4d40dfPLsifNx65bytHxoBSrRA-dtJO_TN5jhYyvNuj5r8PXLYEhDbcIbJLq368-rwDfZi";
 
 
@@ -41,8 +40,8 @@ require([
         });
         
         
-        // Setting up listener to update the coordinate widget with 
-        //  selected coordinates
+        // Setting up listener to update the coordinate- and weather- widget  
+        //  with selected coordinates and weather forecast
         view.on("click", function(evt){
             //Get Point Coordinates
             const params = {
@@ -93,13 +92,7 @@ require([
             fetch(request_url_wthr)
             .then( (response) => response.json())
             .then((data)=> {
-                forecst5d = data.list[data.cnt-1];
-                weatherWidget.updateForecast(
-                    forecst5d.dt_txt,
-                    (forecst5d.main.temp - 273.15).toFixed(1) + "° C", // from Kelvin to Celsius
-                    forecst5d.main.humidity  + " %",
-                    forecst5d.clouds.all  + " %",
-                    (forecst5d.wind.speed*3.6).toFixed(1)   + " km/h");  // m/s to km/h
+                weatherWidget.updateForecast(data);  
                 } )
             .catch( (error) => console.log(error));
             
