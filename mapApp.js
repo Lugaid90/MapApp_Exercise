@@ -27,6 +27,8 @@ require([
         var weatherWidgetContainer = dom.byId("weatherWidget");
         var weatherWidget = new WeatherWidget("").placeAt(weatherWidgetContainer);
         
+        // initializing forecast entries in the weather widget
+        weatherWidget.initializeForecast();
 
         const map = new Map({
             basemap: "dark-gray-vector"
@@ -54,10 +56,10 @@ require([
             coordWidget.updateCoordinates(latitude, longitude);
 
 
-            //Update Weather Widget (and reverse geocode)
+            //Update Weather Widget with reverse geocode and weather forecast
 
             // Consume the OpenCageData API for Reverse Geocoding
-            // var API_KEY = '1f5aa7d5392b4351aeaa6d83eadf550e'; // Conterra, doesn't work :(
+            // var API_KEY = '1f5aa7d5392b4351aeaa6d83eadf550e'; // Conterra key, doesn't work :(
             var API_KEY = '2c84cd9d031745ccadca366dcc0bd7a6';
             var api_url = 'https://api.opencagedata.com/geocode/v1/json'
             var request_url = api_url
@@ -70,6 +72,7 @@ require([
             fetch(request_url)
             .then( (response) => response.json())
             .then((data)=> {
+                console.log(data)
                 if (typeof data.results[0] !== 'undefined'){
                     weatherWidget.updateAdress(data.results[0].formatted);
                 }

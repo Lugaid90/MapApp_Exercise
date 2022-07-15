@@ -2,8 +2,10 @@ define([
     "dojo/_base/declare",
     "dijit/_WidgetBase",
     "dijit/_TemplatedMixin",
+    "dojo/dom", 
+    "/widget/forecastEntry.js",
     "dojo/text!./templates/weatherWidget.html"
-], function(declare,  _WidgetBase, _TemplatedMixin, template){
+], function(declare,  _WidgetBase, _TemplatedMixin, dom, forecastEntry, template){
     return declare([_WidgetBase, _TemplatedMixin], {
 
         // referencing the html-template file
@@ -18,7 +20,6 @@ define([
         postCreate: function(){
             // Run any parent postCreate processes 
             this.inherited(arguments);
-        
         },
 
         // costum setter function which is ment to be used
@@ -27,20 +28,29 @@ define([
             this.adressNode.innerHTML=adress;
         },
 
+        // Pre-Creating Container for forecast entries
+        entry_array: [],    // stores forecast entry for later update
+        initializeForecast: function(){
+            entry_array = [];
+            for(let i = 0; i < 40; i++){
+                var forecastWidgetContainer = dom.byId("nestedEntryHook");
+                var forecastWidget = new forecastEntry("").placeAt(forecastWidgetContainer);
+                entry_array.push(forecastWidget);
+            }
+        },
+
         updateForecast: function(dataObj){
+            forecst_list = dataObj.list;
 
-            forecst5d = dataObj.list[dataObj.cnt-1];
-            date = forecst5d.dt_txt,
-            temp = (forecst5d.main.temp - 273.15).toFixed(1) + "° C", // from Kelvin to Celsius
-            hum = forecst5d.main.humidity  + " %",
-            cloud = forecst5d.clouds.all  + " %",
-            wind = (forecst5d.wind.speed*3.6).toFixed(1)   + " km/h"; // m/s to km/h
+            if (forecst_list.length!== entry_array.length){
+                console.error("Error in updateForecast(): array lengths aren't matching");
+            }
 
-            this.dateNode.innerHTML=date;
-            this.tempNode.innerHTML=temp;
-            this.humNode.innerHTML=hum;
-            this.cloudNode.innerHTML=cloud;
-            this.windNode.innerHTML=wind;
+            for(let i=0; i<forecst_list.length; i++){
+                forecastEntry = forecst_list[i];
+                entryWidget = entry_array[i];
+                entryWidget.updateForecast(forecastEntry);
+            }
         }
     });
     
