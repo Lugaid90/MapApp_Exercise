@@ -12,5 +12,5 @@ live-server
 Nach ausführen, sollte der Standard Browser geöffnet werden.
 
 ## Project Structure
-Zum Betrachten der ersten Teilaufgabe muss der entsprechend benannte branch ausgewählt werden.
+Zum Betrachten der ersten Teilaufgabe muss der "teilaufgabe-1" branch ausgewählt werden.
 Die Bearbeitung der zweiten Teilaufgabe entspricht dem aktuellen Stand des Projekts im main-branch.
