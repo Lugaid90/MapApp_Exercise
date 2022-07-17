@@ -17,3 +17,6 @@ Die Bearbeitung der zweiten Teilaufgabe entspricht dem aktuellen Stand des Proje
 
 ## Teilaufgabe 1
 ![footage teilaufgabe 1](https://github.com/Lugaid90/MapApp_Exercise/blob/main/screenshot_teilaufg1.PNG?raw=true)
+
+## Teilaufgabe 2
+![footage teilaufgabe 2](https://github.com/Lugaid90/MapApp_Exercise/blob/main/screenshot_teilaufg2.PNG?raw=true)
