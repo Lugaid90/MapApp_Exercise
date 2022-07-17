@@ -23,7 +23,7 @@ define([
         },
 
         // costum setter function which is ment to be used
-        //  in a callback for a click listener
+        //  as a callback / a click listener
         updateAdress: function(adress){
             this.adressNode.innerHTML=adress;
         },

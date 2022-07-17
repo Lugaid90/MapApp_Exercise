@@ -72,7 +72,6 @@ require([
             fetch(request_url)
             .then( (response) => response.json())
             .then((data)=> {
-                console.log(data)
                 if (typeof data.results[0] !== 'undefined'){
                     weatherWidget.updateAdress(data.results[0].formatted);
                 }
@@ -80,7 +79,7 @@ require([
                     weatherWidget.updateAdress("No Adress found");
                 }
             } )
-            .catch( (error) => console.log(error));
+            .catch( (error) => console.error(error));
 
 
             // Consume the OpenWeatherMap API for Weather Forecast
@@ -97,7 +96,7 @@ require([
             .then((data)=> {
                 weatherWidget.updateForecast(data);  
                 } )
-            .catch( (error) => console.log(error));
+            .catch( (error) => console.error(error));
             
         });
 
